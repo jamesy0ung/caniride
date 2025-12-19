@@ -23,6 +23,11 @@ class WeatherViewModel: ObservableObject {
     @AppStorage("prefOptTemp") var prefOptTemp: Double = 20.0
     @AppStorage("prefMaxTemp") var prefMaxTemp: Double = 28.0
     
+    // User customisable weights
+    @AppStorage("prefWindWeight") var prefWindWeight: Double = 50.0
+    @AppStorage("prefRainWeight") var prefRainWeight: Double = 50.0
+    @AppStorage("prefTempWeight") var prefTempWeight: Double = 50.0
+    
     func refreshWeather() {
         guard let postcodeInt = Int(postcode), postcode.count == 4 else {
             self.errorMessage = "Enter valid postcode"
@@ -42,7 +47,10 @@ class WeatherViewModel: ObservableObject {
                     maxRainChance: prefMaxRain,
                     minTemp: prefMinTemp,
                     optTemp: prefOptTemp,
-                    maxTemp: prefMaxTemp
+                    maxTemp: prefMaxTemp,
+                    windWeight: prefWindWeight,
+                    rainWeight: prefRainWeight,
+                    tempWeight: prefTempWeight
                 )
                 
                 let calculatedScore = RideQualityCalculator.calculateScore(weather: weather, prefs: prefs)

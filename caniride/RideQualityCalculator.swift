@@ -15,10 +15,27 @@ struct RideQualityCalculator {
         let minTemp: Double
         let optTemp: Double
         let maxTemp: Double
+        
+        // User customisable weights
+        let windWeight: Double
+        let rainWeight: Double
+        let tempWeight: Double
+        
+        // Normalised weights for calculation
+        var normalisedWeights: (wind: Double, rain: Double, temp: Double) {
+            let total = windWeight + rainWeight + tempWeight
+            guard total > 0 else { return (0.33, 0.33, 0.34) }
+            return (
+                wind: windWeight / total,
+                rain: rainWeight / total,
+                temp: tempWeight / total
+            )
+        }
     }
     
     static func calculateScore(weather: WeatherData, prefs: Preferences) -> Int {
         var score = 100.0
+        let weights = prefs.normalisedWeights
         
         // Wind Scoring
         if let wind = weather.windSpeed {
@@ -28,7 +45,7 @@ struct RideQualityCalculator {
             
             let windRatio = wind / prefs.maxWind
             // Apply quadratic penalty because it doesn't feel linear on the bike
-            let windPenalty = pow(windRatio, 2) * 60.0
+            let windPenalty = pow(windRatio, 2) * 60.0 * weights.wind
             score -= windPenalty
         }
         
@@ -37,7 +54,7 @@ struct RideQualityCalculator {
             if rain > prefs.maxRainChance {
                 return 0 // Immediate fail if > maxRainChance
             }
-            let rainPenalty = (Double(rain) / Double(prefs.maxRainChance)) * 30.0
+            let rainPenalty = (Double(rain) / Double(prefs.maxRainChance)) * 30.0 * weights.rain
             score -= rainPenalty
         }
         
@@ -51,7 +68,7 @@ struct RideQualityCalculator {
             let maxDist = temp > prefs.optTemp ? (prefs.maxTemp - prefs.optTemp) : (prefs.optTemp - prefs.minTemp)
             
             if maxDist > 0 {
-                let tempPenalty = (distFromOptimal / maxDist) * 40.0
+                let tempPenalty = (distFromOptimal / maxDist) * 40.0 * weights.temp
                 score -= tempPenalty
             }
         }

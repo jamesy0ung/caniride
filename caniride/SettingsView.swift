@@ -60,6 +60,26 @@ struct SettingsView: View {
                         }), in: 0...100, step: 5)
                     }
                 }
+                
+                Section("Priority Weights") {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading) {
+                            Text("Wind: \(Int(viewModel.prefWindWeight))")
+                            Slider(value: $viewModel.prefWindWeight, in: 0...100, step: 5)
+                        }
+                        VStack(alignment: .leading) {
+                            Text("Rain: \(Int(viewModel.prefRainWeight))")
+                            Slider(value: $viewModel.prefRainWeight, in: 0...100, step: 5)
+                        }
+                        VStack(alignment: .leading) {
+                            Text("Temperature: \(Int(viewModel.prefTempWeight))")
+                            Slider(value: $viewModel.prefTempWeight, in: 0...100, step: 5)
+                        }
+                    }
+                    Text("Set to 0 to ignore a factor. Weights are normalised automatically.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
